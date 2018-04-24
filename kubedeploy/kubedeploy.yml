@@ -1,0 +1,44 @@
+---
+# Deploys kubernetes cluster using kubeadm
+- hosts: localhost
+  gather_facts: false
+  roles:
+    - localexec
+  tags:
+    - localexec
+
+- hosts: tag_kubecluster
+  gather_facts: true
+  become: yes
+  roles:
+    - docker
+  tags:
+    - docker
+
+- hosts: tag_kubecluster
+  gather_facts: true
+  become: yes
+  roles:
+    - kube-prep
+  tags:
+    - kube-prep
+
+- hosts: tag_kubemaster
+  become: yes
+  roles:
+    - kube-init
+  tags:
+    - kube-init
+
+- hosts: tag_kubemaster
+  roles:
+    - kube-sdn
+  tags:
+    - kube-sdn
+
+- hosts: tag_kubeworker
+  become: yes
+  roles:
+    - kube-join
+  tags:
+    - kube-join

@@ -1,0 +1,25 @@
+---
+- name: Flannel Installation
+  debug:
+    msg: "Starting Flannel Installation"
+
+- name: get  user 
+  shell: whoami
+  register: user
+
+- name : print user
+  debug:
+    var: user 
+
+- name: place flannel template on the controller server
+  template: 
+    src: kube-flannel.yml.j2
+    dest: "{{ kubectl_home }}/kube-flannel.yml"
+
+- name: deploying flannel for kubernetes - x86_64
+  shell: "kubectl --kubeconfig .kube/admin.conf create -f kube-flannel.yml"
+  register: deploy_flannel
+
+- name: flannel deployment stdout
+  debug:
+    msg: "{{ deploy_flannel }}"

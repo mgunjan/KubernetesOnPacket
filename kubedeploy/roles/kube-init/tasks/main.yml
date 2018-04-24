@@ -1,0 +1,56 @@
+---
+- name: Remove default kubeadm.conf ExecStart
+  lineinfile:
+    dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    regexp: 'KUBELET_EXTRA_ARGS$'
+    state: absent
+
+- name: Add custom kubeadm.conf ExecStart
+  lineinfile:
+    dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    regexp: 'systemd$'
+    line: 'ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_SYSTEM_PODS_ARGS $KUBELET_NETWORK_ARGS $KUBELET_DNS_ARGS $KUBELET_AUTHZ_ARGS $KUBELET_EXTRA_ARGS --cgroup-driver=systemd'
+
+- name: make sure kubelet is started and enabled
+  service:
+    name: "kubelet"
+    state: restarted
+
+- name: initialize the kubernetes master
+  shell: "kubeadm init --kubernetes-version {{ kube_version }} --pod-network-cidr {{ pod_network_cidr }} --token {{ init_token }} --apiserver-advertise-address {{ kube_api_endpoint }}"
+  register: initout
+
+- name: check kubeadm init status
+  debug: 
+    var: initout
+
+# kubectl cannot be invoked from root.
+    # sudo cp /etc/kubernetes/admin.conf $HOME/
+    # sudo chown $(id -u):$(id -g) $HOME/admin.conf
+    # export KUBECONFIG=$HOME/admin.conf
+
+- name: Ensure .kube folder exists
+  file:
+    path: "{{ kubectl_home }}/.kube/"
+    state: directory
+    owner: "{{ kubectl_user }}"
+    group: "{{ kubectl_group }}"
+    mode: 0755
+
+- name: Copy admin.conf to kubectl user's home
+  shell: >
+    cp -f /etc/kubernetes/admin.conf {{ kubectl_home }}/.kube/admin.conf
+  args:
+    creates: "{{ kubectl_home }}/admin.conf"
+
+- name: Set admin.conf ownership
+  file:
+    path: "{{ kubectl_home }}/.kube/admin.conf"
+    owner: "{{ kubectl_user }}"
+    group: "{{ kubectl_group }}"
+
+- name: Add KUBECONFIG env for admin.conf to .bashrc
+  lineinfile:
+    dest: "{{ kubectl_home }}/.bashrc"
+    regexp: "KUBECONFIG"
+    line: "export KUBECONFIG={{ kubectl_home }}/.kube/admin.conf"

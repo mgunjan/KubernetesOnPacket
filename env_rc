@@ -1,0 +1,4 @@
+#!/bin/bash
+export PACKET_API_TOKEN=
+export TF_VAR_auth_token=
+export TF_VAR_project_id=

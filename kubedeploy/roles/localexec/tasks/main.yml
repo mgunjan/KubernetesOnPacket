@@ -1,0 +1,18 @@
+---
+
+- name: get private ip on master node using terraform output command 
+  command: terraform output master_private_ips
+  args:
+    chdir: "{{ home_dir }}"
+  register: master_private_ip
+
+- name: remove unwanted occurance of kube_api_ip from group_var file 
+  lineinfile: 
+    dest: "{{ home_dir }}/kubedeploy/group_vars/all.yml"
+    regexp: "kube_api_endpoint"
+    state: absent
+
+- name : assign terraform o/p to kube_api_endpoint variable
+  lineinfile:
+    dest: "{{ home_dir }}/kubedeploy/group_vars/all.yml"
+    line: "kube_api_endpoint: {{ master_private_ip.stdout }}"

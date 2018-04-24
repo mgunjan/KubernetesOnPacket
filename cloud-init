@@ -1,0 +1,12 @@
+#cloud-config
+users:
+  - name: kubeuser
+    ssh-authorized-keys:
+      - 
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    groups: sudo
+    gecos: Kubernetes User account for managing host using Ansible
+    shell: /bin/bash
+    home: /home/kubeuser
+    lock_passwd: True
+    plain_text_passwd: 

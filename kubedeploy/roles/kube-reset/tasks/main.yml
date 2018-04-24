@@ -1,0 +1,6 @@
+---
+- name: Remove kubernetes install using kubeadm
+  shell: "kubeadm reset"
+  become: yes
+
+

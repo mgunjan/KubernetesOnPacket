@@ -1,0 +1,3 @@
+---
+- name: join workers to the initialized kubernetes cluster
+  command: "kubeadm join --token {{ init_token }} {{ kube_api_endpoint }}:6443  --discovery-token-unsafe-skip-ca-verification"

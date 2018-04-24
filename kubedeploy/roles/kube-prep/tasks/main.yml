@@ -1,0 +1,43 @@
+---
+- name: swap - disable swap
+  command: swapoff --all
+
+- name: swap - remove current swaps from fstab
+  lineinfile:
+    dest: /etc/fstab
+    regexp: '^/[\S]+\s+none\s+swap '
+    state: absent
+ 
+- name: Add an Apt signing key for downloading kubernetes bits
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Add kubernetes repository to the source list
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: kubernetes.list
+
+- name: Update apt packages
+  apt:
+    update_cache: yes
+
+- name: install kubeadm and required prereqs
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  with_items:
+  - kubelet
+  - kubeadm
+  - kubectl
+  - kubernetes-cni
+
+- name: enable and start kubernetes related packages
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items:
+  - kubelet
