@@ -51,7 +51,13 @@ Ansible is used for deploying and configuring kubernetes Cluster. Kubernetes dep
     * Create API Key 
     * Upload SSH key to Project   
              
-3. Deploy Kubernetes 
+3. Git Clone the repository on to host machine.
+   
+   ```
+   git clone git@github.com:mgunjan/KubernetesOnPacket.git 
+
+ 
+4. Deploy Kubernetes 
 
     * Update env_rc file to put in api-key and project-id from Packet Account 
        
@@ -72,7 +78,7 @@ Ansible is used for deploying and configuring kubernetes Cluster. Kubernetes dep
     * Update terraform.tfvars with appropriate tags and values. (file is self-explanatory)
    
 
-    *  Deploy Servers
+    * Deploy Servers
 
        ```
        terraform init
@@ -80,7 +86,14 @@ Ansible is used for deploying and configuring kubernetes Cluster. Kubernetes dep
        terraform apply
        ```
     
-   *  Run Ansible Playbook for Kubernetes Deployment
+   * Update Ansible Variable file to reflect the working directory location needed for local execution part of Ansible playbook
+     
+      ```
+      # Path where the git repo can been copied
+      home_dir: /home/<host-machine-user>/KubernetesOnPacket
+      ```
+
+   * Run Ansible Playbook for Kubernetes Deployment from /home/<host-machine-user>/KubernetesOnPacket location (or reference to packet-net.py dynamic inventory file which is in /home/<host-machine-user>/KubernetesOnPacket folder) 
 
       ```
       $ ansible-playbook -i packet-net.py kubedeploy.yml
