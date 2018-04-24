@@ -12,17 +12,19 @@ Ansible is used for deploying and configuring kubernetes Cluster. Kubernetes dep
 
 ## Demo Steps
 1. Setup Local Deployment Environment ( For Windows user, Linux VM with Internet Access )
-    * Install SSH and Generate sshkey
+    * Install SSH and Generate sshkey ( generate key for the host user from which you will be running deployment script )
 
       ```
       sudo apt-get install openssh-server
-      sudo ssh-keygen -t rsa
+      ssh-keygen -t rsa
       ```
     
-    * Check Python is available if not Install
+    * Check Python is available if not Install. Install pip and packet api library
       
       ```
       python --version 
+      sudo apt-get install python-pip
+      pip install packet-python
       ```
 
     * Install Ansible
